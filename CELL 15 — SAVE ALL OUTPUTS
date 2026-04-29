@@ -1,0 +1,60 @@
+
+
+# Save model weights
+torch.save(model.state_dict(), "final_renal_model.pth")
+print("✅ Model weights     → final_renal_model.pth")
+
+# Save vocabulary
+with open("vocab.pkl", "wb") as f:
+    pickle.dump(vocab, f)
+print("✅ Vocabulary        → vocab.pkl")
+
+# Save training history
+with open("training_history.json", "w") as f:
+    json.dump(history, f)
+print("✅ Training history  → training_history.json")
+
+# Save BLEU scores
+with open("bleu_scores.json", "w") as f:
+    json.dump(bleu_scores, f)
+print("✅ BLEU scores       → bleu_scores.json")
+
+# Print summary
+print("\n" + "="*60)
+print("   PROJECT COMPLETE — ALL FILES SAVED")
+print("="*60)
+print("  final_renal_model.pth       ← trained model weights")
+print("  best_renal_model.pth        ← best checkpoint (lowest val loss)")
+print("  vocab.pkl                   ← vocabulary dictionary")
+print("  training_history.json       ← loss/accuracy per epoch")
+print("  bleu_scores.json            ← BLEU-1 to BLEU-4")
+print("  training_curves.png         ← Figure 6 (loss + accuracy)")
+print("  enhancement_comparison.png  ← Figure 4 (4 methods)")
+print("  sample_images.png           ← sample CT images")
+print("  class_distribution.png      ← dataset bar chart")
+print("  clinical_report_Normal.png  ← report figure")
+print("  clinical_report_Cyst.png    ← report figure")
+print("  clinical_report_Tumor.png   ← report figure")
+print("  clinical_report_Stone.png   ← report figure")
+print("  report_Normal.txt           ← full text report")
+print("  report_Cyst.txt             ← full text report")
+print("  report_Tumor.txt            ← full text report")
+print("  report_Stone.txt            ← full text report")
+print("="*60)
+
+# Download all outputs to your computer
+from google.colab import files
+for fname in [
+    "final_renal_model.pth", "vocab.pkl",
+    "training_history.json", "bleu_scores.json",
+    "training_curves.png", "enhancement_comparison.png",
+    "clinical_report_Normal.png", "clinical_report_Cyst.png",
+    "clinical_report_Tumor.png",  "clinical_report_Stone.png",
+    "report_Normal.txt", "report_Cyst.txt",
+    "report_Tumor.txt",  "report_Stone.txt",
+]:
+    if os.path.exists(fname):
+        files.download(fname)
+        print(f"   ⬇  {fname}")
+
+print("\n🎉 All done! Check your Downloads folder.")
