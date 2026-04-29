@@ -1,0 +1,35 @@
+
+
+def evaluate_bleu(model, test_loader, vocab, device):
+    """Computes BLEU-1 to BLEU-4 on the test set."""
+    model.load_state_dict(torch.load("best_renal_model.pth", map_location=device))
+    model.eval()
+    refs, hyps = [], []
+
+    with torch.no_grad():
+        for imgs, reps, _ in tqdm(test_loader, desc="BLEU eval"):
+            imgs = imgs.to(device)
+            for i in range(imgs.size(0)):
+                gen  = model.generate(imgs[i].unsqueeze(0), vocab,
+                                      max_len=80, device=device)
+                ref  = vocab.decode(reps[i].tolist())
+                hyps.append(gen.split())
+                refs.append([ref.split()])
+
+    sm = SmoothingFunction().method1
+    b1 = corpus_bleu(refs, hyps, weights=(1,0,0,0),           smoothing_function=sm)
+    b2 = corpus_bleu(refs, hyps, weights=(0.5,0.5,0,0),       smoothing_function=sm)
+    b3 = corpus_bleu(refs, hyps, weights=(.33,.33,.33,0),      smoothing_function=sm)
+    b4 = corpus_bleu(refs, hyps, weights=(.25,.25,.25,.25),    smoothing_function=sm)
+
+    print("\n" + "="*50)
+    print("      BLEU EVALUATION RESULTS")
+    print("="*50)
+    print(f"  BLEU-1 : {b1:.4f}")
+    print(f"  BLEU-2 : {b2:.4f}")
+    print(f"  BLEU-3 : {b3:.4f}")
+    print(f"  BLEU-4 : {b4:.4f}")
+    print("="*50)
+    return {"bleu1": b1, "bleu2": b2, "bleu3": b3, "bleu4": b4}
+
+bleu_scores = evaluate_bleu(model, test_loader, vocab, DEVICE)
