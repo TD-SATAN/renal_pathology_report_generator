@@ -1,0 +1,108 @@
+
+
+def generate_and_display_report(image_path, true_label, model, vocab, device):
+    """
+    For a given CT kidney image:
+      1. Runs the model to get a machine-generated summary
+      2. Generates a full detailed clinical report using templates
+      3. Displays both side by side in a figure
+      4. Saves report as .txt
+
+    Args:
+        image_path  : path to CT image
+        true_label  : one of Normal / Cyst / Tumor / Stone
+        model       : trained RenalReportGenerator
+        vocab       : Vocabulary object
+        device      : cuda or cpu
+    """
+    # ---- Load and enhance image ----
+    img_bgr  = cv2.imread(image_path)
+    img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    img_enh  = apply_gamma_correction(img_gray)
+    img_rgb  = cv2.cvtColor(img_enh, cv2.COLOR_GRAY2RGB)
+    img_pil  = Image.fromarray(img_rgb)
+
+    tf = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])
+    ])
+    img_tensor = tf(img_pil).unsqueeze(0).to(device)
+
+    # ---- Machine-generated short summary ----
+    model.load_state_dict(torch.load("best_renal_model.pth", map_location=device))
+    machine_summary = model.generate(img_tensor, vocab, max_len=80, device=device)
+
+    # ---- Full detailed clinical report ----
+    full_report = make_report(true_label)
+
+    # ---- Display figure ----
+    fig = plt.figure(figsize=(22, 14))
+    gs  = fig.add_gridspec(1, 2, width_ratios=[1, 2.2], wspace=0.05)
+
+    # Left panel: CT image
+    ax_img = fig.add_subplot(gs[0])
+    ax_img.imshow(img_enh, cmap="gray")
+    ax_img.set_title(f"CT Kidney Scan\nDiagnosis: {true_label}",
+                     fontsize=12, fontweight="bold", color="navy", pad=10)
+    ax_img.axis("off")
+
+    # Machine summary below image
+    fig.text(0.02, 0.03,
+             f"Model prediction summary:\n{machine_summary[:200]}",
+             fontsize=8, style="italic", color="#555555",
+             bbox=dict(boxstyle="round,pad=0.4", facecolor="#f4f4f4",
+                       edgecolor="#cccccc", alpha=0.9))
+
+    # Right panel: full report
+    ax_rep = fig.add_subplot(gs[1])
+    ax_rep.axis("off")
+
+    wrapped_report = "\n".join(
+        textwrap.fill(line, width=85) if line.strip() else ""
+        for line in full_report.split("\n")
+    )
+
+    ax_rep.text(0.01, 0.99, wrapped_report,
+                transform=ax_rep.transAxes,
+                fontsize=7.2,
+                verticalalignment="top",
+                fontfamily="monospace",
+                linespacing=1.4,
+                bbox=dict(boxstyle="round,pad=0.9",
+                          facecolor="#fffef5",
+                          edgecolor="#c8c89a",
+                          linewidth=1.2,
+                          alpha=0.97))
+
+    fig.suptitle("RENAL PATHOLOGY REPORT GENERATOR — Clinical Output",
+                 fontsize=14, fontweight="bold", color="darkred", y=1.01)
+
+    out_fig = f"clinical_report_{true_label}.png"
+    plt.savefig(out_fig, dpi=120, bbox_inches="tight")
+    plt.show()
+
+    # ---- Save report as text file ----
+    out_txt = f"report_{true_label}.txt"
+    with open(out_txt, "w") as f:
+        f.write(full_report)
+
+    print(f"✅ Saved: {out_fig}  |  {out_txt}")
+    print("\n" + "="*80)
+    print(full_report)
+    print("="*80)
+
+    return full_report
+
+
+# ---- Generate one report per condition ----
+for label in ["Normal", "Cyst", "Tumor", "Stone"]:
+    sample = df_test[df_test["label"] == label].iloc[0]
+    print(f"\n{'='*30} {label} {'='*30}")
+    generate_and_display_report(
+        image_path  = sample["image_path"],
+        true_label  = label,
+        model       = model,
+        vocab       = vocab,
+        device      = DEVICE
+    )
