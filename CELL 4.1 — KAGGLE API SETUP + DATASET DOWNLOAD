@@ -1,0 +1,66 @@
+
+
+from google.colab import drive
+
+# This mounts your Google Drive at /content/drive
+drive.mount('/content/drive')
+print("✅ Google Drive mounted!")
+
+# List what's in your drive to confirm
+import os
+print("\nYour Drive contents:")
+for item in os.listdir('/content/drive/MyDrive/'):
+    print(f"  {item}")
+
+# Run this ONLY if Cell 5 says "Could not find dataset folder"
+print("Your Google Drive structure (3 levels deep):")
+import os
+for root, dirs, files in os.walk("/content/drive/MyDrive"):
+    depth = root.replace("/content/drive/MyDrive", "").count(os.sep)
+    if depth > 3: continue
+    indent = "  " * depth
+    print(f"{indent}{os.path.basename(root)}/")
+
+# ── Run this to see EXACTLY what files are in your dataset
+import os, pandas as pd
+
+DATA_ROOT = "/content/drive/MyDrive/Dataset/Final Year Project/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone/CT-KIDNEY-DATASET-Normal-Cyst-Tumor-Stone"
+
+# ── Accept all image extensions including uppercase ──
+VALID_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"}
+
+rows = []   # use a simple list, build DataFrame at the end
+
+for label in ["Normal", "Cyst", "Tumor", "Stone"]:
+    folder = os.path.join(DATA_ROOT, label)
+
+    if not os.path.exists(folder):
+        print(f"❌ Missing folder: {folder}")
+        continue
+
+    files_in_folder = os.listdir(folder)
+    image_files = [
+        f for f in files_in_folder
+        if os.path.splitext(f)[1].lower() in VALID_EXTS
+    ]
+
+    print(f"  {label:8s} → {len(files_in_folder):,} total files | "
+          f"{len(image_files):,} images found")
+
+    for fname in image_files:
+        rows.append({
+            "image_path" : os.path.join(folder, fname),
+            "label"      : label,
+            "report"     : make_report(label)
+        })
+
+# ── Build DataFrame explicitly with column names ──
+df_all = pd.DataFrame(rows, columns=["image_path", "label", "report"])
+
+print(f"\n✅ df_all created")
+print(f"   Shape   : {df_all.shape}")
+print(f"   Columns : {df_all.columns.tolist()}")
+print(f"\nClass counts:")
+print(df_all["label"].value_counts())
+print(f"\nFirst row:")
+print(df_all.iloc[0])
