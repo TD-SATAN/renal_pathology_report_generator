@@ -1,7 +1,4 @@
-# ==============================================================================
-# ████  CELL 1 — INSTALL LIBRARIES  ████
-# Copy this into Colab Cell 1 and run it first. Takes about 2-3 minutes.
-# ==============================================================================
+
 get_ipython().system('pip install -q transformers==4.38.0')
 get_ipython().system('pip install -q torch torchvision')
 get_ipython().system('pip install -q Pillow opencv-python-headless')
