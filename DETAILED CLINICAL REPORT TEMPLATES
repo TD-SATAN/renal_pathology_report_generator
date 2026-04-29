@@ -1,0 +1,519 @@
+# ==============================================================================
+# ████  CELL 3 — DETAILED CLINICAL REPORT TEMPLATES  ████
+# This cell defines all 4 condition report templates (Normal/Cyst/Tumor/Stone)
+# Run this cell before anything else that uses make_report()
+# ==============================================================================
+
+# ---------------------------------------------------------------------------
+# Report templates — written like real radiologist reports given to patients
+# ---------------------------------------------------------------------------
+
+REPORT_TEMPLATES = {
+
+    "Normal": [
+        """RENAL CT SCAN REPORT
+
+Date of Examination : {date}
+Examination Type    : CT Scan of Kidneys (With & Without Contrast)
+Referring Physician : Dr. {ref_doc}
+Radiologist         : Dr. {rad_doc}
+Patient ID          : {pid}
+
+CLINICAL INDICATION:
+{indication}
+
+TECHNIQUE:
+CT of the kidneys was performed using a multidetector CT scanner with axial,
+coronal, and sagittal reconstructions. Pre-contrast and post-contrast phases
+(corticomedullary and nephrographic) were acquired.
+
+FINDINGS:
+
+RIGHT KIDNEY:
+  Size and Position   : {r_size} cm in bipolar length — within normal limits (9-12 cm).
+                        Normal position in the right retroperitoneal fossa.
+  Cortex / Medulla    : Normal cortical thickness (~10mm). Clear corticomedullary
+                        differentiation. No focal lesion or mass.
+  Collecting System   : Non-dilated pelvis and calyces. No filling defects.
+  Renal Vasculature   : Right renal artery and vein are patent. No stenosis.
+  Perinephric Space   : Clear. No fluid collection or stranding.
+
+LEFT KIDNEY:
+  Size and Position   : {l_size} cm in bipolar length — within normal limits.
+                        Normal left retroperitoneal position.
+  Cortex / Medulla    : Normal cortical thickness. No focal abnormality.
+  Collecting System   : Patent and non-dilated. No calculi.
+  Renal Vasculature   : Left renal artery and vein are normal.
+  Perinephric Space   : No abnormality.
+
+ADDITIONAL FINDINGS:
+  Adrenal Glands      : Bilateral adrenal glands normal in size and attenuation.
+  Retroperitoneum     : No enlarged lymph nodes.
+  Urinary Bladder     : Partially seen. No obvious wall thickening or filling defect.
+  Visualised Bowel    : Unremarkable within the field of view.
+
+IMPRESSION:
+NORMAL BILATERAL KIDNEYS.
+No evidence of renal mass, cyst, calculus, hydronephrosis, or parenchymal
+abnormality. Symmetrical kidneys with preserved corticomedullary differentiation.
+No further renal imaging currently recommended.
+
+RECOMMENDATION:
+Routine clinical follow-up as indicated. No urgent intervention required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCTOR'S EXPLANATION TO PATIENT (Plain Language)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your CT scan results are completely NORMAL. Both your kidneys are healthy,
+the right measuring {r_size} cm and the left {l_size} cm — both within the
+normal range. There are no kidney stones, cysts, tumours, or blockages found.
+The blood vessels supplying your kidneys look healthy too.
+
+This is reassuring news. You do not need any further kidney imaging at this time.
+Please follow up with your doctor to discuss these results alongside your
+other symptoms and medical history.
+
+Reported by : Dr. {rad_doc} — Consultant Radiologist
+Date        : {date}
+""",
+    ],
+
+    "Cyst": [
+        """RENAL CT SCAN REPORT
+
+Date of Examination : {date}
+Examination Type    : CT Kidneys (Multiparametric with Contrast)
+Referring Physician : Dr. {ref_doc}
+Radiologist         : Dr. {rad_doc}
+Patient ID          : {pid}
+
+CLINICAL INDICATION:
+{indication}
+
+TECHNIQUE:
+Contrast-enhanced CT of the kidneys. Pre-contrast, arterial, venous, and
+delayed phase images acquired. Coronal and sagittal reformats performed.
+
+FINDINGS:
+
+RIGHT KIDNEY:
+  Dimensions          : {r_size} cm — normal.
+  Parenchyma          : Normal cortical thickness and attenuation.
+
+  *** CYSTIC LESION ***
+  Location            : {location} pole of the right kidney
+  Size                : {cyst_size} cm in maximum diameter
+  Shape               : Well-defined, round / ovoid
+  Attenuation (pre)   : Homogeneous fluid density (~0–20 HU)
+  Attenuation (post)  : NO enhancement of wall or contents post-contrast
+  Wall                : Imperceptibly thin. No perceptible wall thickening.
+  Internal Structure  : Anechoic — no septa, nodules, or calcifications
+  Perinephric effect  : None. No extrinsic compression of collecting system.
+  Bosniak Class       : CATEGORY I — Simple benign cyst
+  Malignancy risk     : < 1% (essentially zero)
+
+  Collecting System   : Non-dilated. Not compressed by cyst.
+  Renal Vein / Artery : Normal calibre and enhancement. No thrombosis.
+
+LEFT KIDNEY:
+  Dimensions          : {l_size} cm — normal.
+  No cystic or solid lesion identified on the left side.
+  Normal collecting system. No hydronephrosis.
+
+ADDITIONAL FINDINGS:
+  No regional lymphadenopathy. Adrenal glands normal bilaterally.
+  No ascites or peritoneal deposits.
+
+BOSNIAK CLASSIFICATION — PATIENT GUIDE:
+  Category I   : Simple benign cyst — YOUR RESULT — No follow-up needed
+  Category II  : Minimally complex — 6-month follow-up
+  Category IIF : Mildly complex — annual follow-up
+  Category III : Indeterminate — surgical evaluation
+  Category IV  : Highly suspicious malignancy — surgery recommended
+
+IMPRESSION:
+SIMPLE RENAL CYST — {location} pole, right kidney. Bosniak Category I.
+BENIGN FINDING. No malignant features. No treatment required.
+Left kidney is NORMAL.
+
+RECOMMENDATION:
+1. No immediate treatment or biopsy required.
+2. Optional ultrasound follow-up in 12 months to confirm stability.
+3. If you develop flank pain, blood in urine, or fever — see your doctor promptly.
+4. No dietary or activity restrictions required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCTOR'S EXPLANATION TO PATIENT (Plain Language)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Good news — we found a small fluid-filled sac called a "simple cyst" in the
+{location} part of your right kidney. It measures {cyst_size} cm across.
+
+What is a kidney cyst?
+A kidney cyst is like a small water balloon that forms in or on the kidney.
+Simple cysts like yours are extremely common — about 1 in 4 adults over 40
+have at least one. They are NOT cancer, they do NOT become cancer, and they
+almost never cause any health problems.
+
+What happens next?
+You do NOT need surgery, medication, or a biopsy. We simply recommend a
+follow-up ultrasound scan in about 12 months to confirm the cyst has not
+grown or changed. Your left kidney is completely healthy and normal.
+
+If you notice blood in your urine, sharp side pain, or fever, contact
+your doctor — but this is uncommon with simple cysts.
+
+Reported by : Dr. {rad_doc} — Consultant Radiologist
+Date        : {date}
+""",
+    ],
+
+    "Tumor": [
+        """RENAL CT SCAN REPORT  *** URGENT ***
+
+Date of Examination : {date}
+Examination Type    : CT Kidneys — Multiparametric Contrast-Enhanced
+Referring Physician : Dr. {ref_doc}
+Radiologist         : Dr. {rad_doc}
+Patient ID          : {pid}
+Report Priority     : *** URGENT — Please action within 24–48 hours ***
+
+CLINICAL INDICATION:
+{indication}
+
+TECHNIQUE:
+Multiphasic contrast-enhanced CT. Pre-contrast, corticomedullary (25s),
+nephrographic (80s), and excretory (5min) phases acquired. 3D volumetric
+reformatting performed for lesion characterisation and staging.
+
+FINDINGS:
+
+RIGHT KIDNEY:
+  Dimensions          : {r_size} cm — mildly enlarged.
+
+  *** SOLID RENAL MASS — URGENT ***
+  Location            : {location} pole, right kidney
+  Size                : {tumor_size} cm in maximum axial diameter
+  Shape               : Lobulated, exophytic component present
+  Attenuation (pre)   : Heterogeneous — 30–45 HU (soft tissue density)
+  Enhancement (art)   : MARKED arterial enhancement — up to 120 HU
+                        Rapid washout on venous and delayed phases.
+                        This "wash in / wash out" pattern is the hallmark
+                        of CLEAR CELL RENAL CELL CARCINOMA (ccRCC).
+  Internal Structure  : Areas of central necrosis. No calcification.
+  Margins             : Irregular, lobulated contour
+  Renal Capsule       : Appears intact. No perinephric fat invasion visible.
+  Gerota Fascia       : Not breached on this examination.
+  Renal Sinus         : No sinus fat invasion.
+  Ipsilateral Adrenal : No metastatic deposit identified.
+
+  Renal Vein          : Patent. NO tumour thrombus in right renal vein.
+  IVC                 : Inferior vena cava appears clear. No venous invasion.
+  Collecting System   : Mildly distorted. No frank obstruction or haematuria source.
+
+LEFT KIDNEY:
+  Dimensions          : {l_size} cm — normal.
+  No mass, cyst, or suspicious lesion. Normal enhancement pattern.
+  Collecting system non-dilated.
+
+LYMPH NODES:
+  No enlarged para-aortic, paracaval, or iliac lymph nodes visible.
+  Largest node: < 8mm short axis (within normal limits).
+
+ADRENAL GLANDS:
+  Bilateral adrenals normal. No suspicious deposits.
+
+PRELIMINARY TNM STAGING:
+  T stage : T1b (tumour > 4cm but ≤ 7cm, confined to kidney)
+            ** Requires MDT confirmation **
+  N stage : N0 — No regional lymph node metastasis visible
+  M stage : M0 — No distant metastasis on this scan
+            ** Chest CT essential to complete M staging **
+
+IMPRESSION:
+SOLID ENHANCING RENAL MASS — {location} pole, right kidney ({tumor_size} cm).
+Enhancement characteristics are HIGHLY SUSPICIOUS FOR RENAL CELL CARCINOMA (RCC),
+most likely clear cell subtype.
+Tumour appears organ-confined at this stage — a FAVOURABLE FINDING.
+No vascular invasion or lymphadenopathy identified.
+URGENT UROLOGICAL REFERRAL REQUIRED.
+
+URGENT RECOMMENDATIONS:
+1. *** Refer to Urology / Uro-Oncology within 2 weeks ***
+2. CT Chest with contrast — to complete distant staging (M stage)
+3. MDT (Multidisciplinary Team) discussion — urology, oncology, radiology
+4. Blood tests: FBC, U&E, eGFR, LFTs, LDH, calcium, urine dipstick
+5. Bone scan if patient reports bone pain or elevated ALP
+6. Consider CT-guided biopsy prior to treatment IF diagnosis uncertain
+7. Discuss surgical options: partial nephrectomy vs radical nephrectomy
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCTOR'S EXPLANATION TO PATIENT (Plain Language)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+We have found an abnormal growth (mass) measuring {tumor_size} cm in your
+right kidney that requires urgent medical attention.
+
+What did we find?
+The CT scan shows a solid growth in the {location} part of your right kidney.
+The way this growth absorbs and releases the contrast dye we injected is
+characteristic of a type of kidney cancer called Renal Cell Carcinoma (RCC).
+However, please understand — only a biopsy or surgical removal can give a
+100% definitive diagnosis of cancer.
+
+Is it serious?
+The most important finding is that the growth appears to be CONTAINED within
+your right kidney — it has not spread to nearby lymph nodes, blood vessels,
+or other organs based on this scan. This is an important positive sign, as
+kidney cancers found at this stage respond much better to treatment.
+
+What happens next?
+You will be referred urgently to a kidney specialist (urologist) who will
+discuss your treatment options. These may include:
+  • Surgery to remove part of the kidney (partial nephrectomy) — preferred
+  • Surgery to remove the whole kidney (radical nephrectomy)
+  • Further scans to check if cancer has spread
+
+Your left kidney is completely normal, which is reassuring.
+
+Please do not panic. Kidney cancer found at this stage is often very
+treatable. Your medical team will guide you through every step.
+
+*** This report has been communicated directly to your referring doctor ***
+
+Reported by : Dr. {rad_doc} — Consultant Radiologist (Uro-Radiology)
+Date        : {date}
+""",
+    ],
+
+    "Stone": [
+        """RENAL CT SCAN REPORT
+
+Date of Examination : {date}
+Examination Type    : Non-Contrast CT KUB (Kidney, Ureter, Bladder)
+Referring Physician : Dr. {ref_doc}
+Radiologist         : Dr. {rad_doc}
+Patient ID          : {pid}
+
+CLINICAL INDICATION:
+{indication}
+
+TECHNIQUE:
+Non-contrast CT of kidneys, ureters, and bladder (CT KUB) performed.
+Axial 3mm slices with coronal reformats. No contrast administered
+(contrast not required — stones are best seen without contrast on CT).
+
+FINDINGS:
+
+RIGHT KIDNEY:
+  Dimensions          : {r_size} cm — normal to mildly enlarged.
+  Cortical Thickness  : Mildly reduced at {location} pole — suggests
+                        chronic intermittent obstruction at this site.
+
+  *** RENAL CALCULI (KIDNEY STONES) ***
+  Number of Stones    : {stone_num} calculus/calculi identified
+  Location            : {location} pole calyx / pelvi-ureteric junction (PUJ)
+  Size (largest)      : {stone_size} mm in maximum diameter
+  Attenuation         : {stone_hu} HU — consistent with calcium oxalate stone
+                        (most common type, ~80% of all kidney stones)
+  Shape               : Round / ovoid with smooth margins
+  Other stones        : Multiple smaller calculi in {location} calyceal system
+
+  HYDRONEPHROSIS      : PRESENT — Grade {hyd_grade}/4
+  Description         : Dilatation of the right renal pelvis measuring
+                        {pelvis_size} mm (normal < 10mm). Dilatation of
+                        {location} pole calyces. Secondary to partial
+                        obstruction by the calculus.
+  Perinephric Fat     : Mild stranding in the right perinephric fat —
+                        indicates inflammatory/obstructive change.
+  Post-obstructive    : Mild cortical thinning at {location} pole.
+
+  Right Ureter        : Mildly dilated to {urt_size} mm in upper third
+                        proximal to level of obstructing calculus.
+                        Ureteral jet sign: absent on right (confirms obstruction).
+
+LEFT KIDNEY:
+  Dimensions          : {l_size} cm — normal.
+  No calculi identified on the left side.
+  No hydronephrosis. Normal collecting system.
+  Normal cortical thickness and perinephric fat.
+
+URINARY BLADDER:
+  No calculus within the bladder. Normal wall thickness. No filling defect.
+
+STONE COMPOSITION PREDICTION (based on HU):
+  {stone_hu} HU → Most likely Calcium Oxalate Monohydrate
+  (harder stone — may require intervention if > 10mm)
+
+SEVERITY ASSESSMENT:
+  Stone size        : {stone_size} mm
+  Spontaneous passage probability:
+    < 4mm  → ~80% pass spontaneously
+    4–6mm  → ~59% pass spontaneously
+    > 6mm  → ~21% pass spontaneously — intervention likely needed
+  Your stone ({stone_size}mm): {pass_prob}
+
+IMPRESSION:
+1. NEPHROLITHIASIS — right kidney, {location} pole.
+   {stone_num} stone(s), largest {stone_size} mm ({stone_hu} HU).
+2. MILD-TO-MODERATE RIGHT HYDRONEPHROSIS (Grade {hyd_grade}/4) secondary
+   to calculus obstruction. Partial obstruction confirmed.
+3. LEFT KIDNEY NORMAL — no calculi, no hydronephrosis.
+
+RECOMMENDATIONS:
+1. Urgent urology review if fever, rigors, or single functioning kidney
+   (obstructed infected kidney = surgical emergency)
+2. Urine dipstick + mid-stream culture — exclude urosepsis
+3. Blood: FBC, CRP, U&E, eGFR, serum calcium, uric acid, PTH
+4. 24-hour urine collection for metabolic stone workup (recurrence prevention)
+5. Pain management: diclofenac 75mg PR/oral + tamsulosin 400mcg nocte
+   (alpha-blocker aids ureteral relaxation and stone passage)
+6. Fluid intake: INCREASE to 2.5–3 litres per day (dilutes urine)
+7. Diet: Low salt (< 6g/day), low animal protein, moderate calcium
+8. Strain urine through mesh to collect stone for composition analysis
+9. If stone > 6mm or not passing after 4–6 weeks:
+   → ESWL (Extracorporeal Shockwave Lithotripsy) — breaks stone with sound waves
+   → Ureteroscopy + laser lithotripsy — telescope + laser to break/remove stone
+   → Percutaneous nephrolithotomy (PCNL) — for large stones > 2cm
+
+EMERGENCY WARNING SIGNS — GO TO A&E IMMEDIATELY IF:
+  ⚠ Fever > 38°C with loin pain (infected obstructed kidney — emergency)
+  ⚠ Unable to pass urine
+  ⚠ Uncontrolled vomiting
+  ⚠ Severe worsening pain not controlled by painkillers
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCTOR'S EXPLANATION TO PATIENT (Plain Language)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your CT scan has found kidney stones in your right kidney.
+
+What are kidney stones?
+Kidney stones are hard deposits of minerals (usually calcium) that form
+inside the kidneys. They are very common — about 1 in 10 people develop
+one at some point in their life.
+
+What did we find exactly?
+We found {stone_num} stone(s) in your right kidney. The largest stone
+measures {stone_size} mm. This stone is partially blocking the flow of
+urine out of your kidney, which is causing the kidney to swell slightly
+(this swelling is called hydronephrosis — grade {hyd_grade} out of 4,
+which is mild to moderate). Your LEFT kidney is completely normal.
+
+Will the stone pass on its own?
+{pass_prob_long} We recommend drinking 2.5 to 3 litres of water
+every day to help flush the stone through. Your doctor may also prescribe
+a medication called tamsulosin which relaxes the ureter and helps the
+stone pass more easily.
+
+What if it doesn't pass?
+If the stone does not pass within 4–6 weeks, or if it is too large,
+your urologist may recommend a procedure:
+  • Shockwave therapy (ESWL) — uses sound waves to break the stone
+    into tiny pieces that can be passed in urine (no incisions needed)
+  • Ureteroscopy — a thin telescope passed through your urethra to
+    grab or laser the stone (done under general anaesthetic, 30–45 min)
+
+How do I prevent stones in future?
+  • Drink 2.5–3 litres of water daily (most important step)
+  • Reduce salt in your diet
+  • Reduce red meat and processed foods
+  • Eat normal amounts of dairy (low calcium diet actually worsens stones)
+  • Your doctor may prescribe medication based on your urine/blood tests
+
+IMPORTANT: If you develop a fever along with your pain, go to the
+Emergency Department immediately — this can indicate a serious infection.
+
+Reported by : Dr. {rad_doc} — Consultant Radiologist
+Date        : {date}
+""",
+    ],
+}
+
+
+# ---------------------------------------------------------------------------
+# Helper data for generating realistic patient/doctor information
+# ---------------------------------------------------------------------------
+RADIOLOGISTS  = ["S. Krishnan", "A. Mehta", "P. Nair", "R. Gupta",
+                  "M. Iyer", "S. Sharma", "K. Patel", "V. Reddy"]
+SPECIALTIES   = ["Nephrologist", "Urologist", "General Physician",
+                  "Oncologist", "Emergency Medicine"]
+LAST_NAMES    = ["Sharma", "Patel", "Kumar", "Singh", "Krishnan", "Ali",
+                  "Hassan", "Johnson", "Williams", "Chen", "Nair", "Brown",
+                  "Ramesh", "Venkat", "Suresh", "Arjun", "Balan", "Das"]
+INDICATIONS   = [
+    "Right flank pain radiating to groin — rule out renal calculus or mass.",
+    "Haematuria (blood in urine) for 2 weeks — investigate renal cause.",
+    "Incidental renal lesion noted on abdominal ultrasound — further characterisation.",
+    "Hypertension with suspected renal artery stenosis — evaluate renal morphology.",
+    "Left loin pain with elevated serum creatinine — exclude obstruction.",
+    "Follow-up of previously detected renal abnormality.",
+    "Weight loss, fatigue, and left flank fullness — exclude renal malignancy.",
+    "Recurrent urinary tract infections — exclude structural renal abnormality.",
+    "Screening for hereditary renal cancer syndrome (Von Hippel-Lindau disease).",
+    "Nausea, vomiting, and colicky abdominal pain — query renal colic.",
+]
+LOCATIONS     = ["upper", "mid", "lower"]
+
+
+def make_report(label):
+    """
+    Generates a complete, realistic clinical radiology report for a given
+    renal condition label.
+
+    Args:
+        label : one of "Normal", "Cyst", "Tumor", "Stone"
+
+    Returns:
+        report_text : full multi-section report string
+    """
+    templates = REPORT_TEMPLATES.get(label, REPORT_TEMPLATES["Normal"])
+    template  = random.choice(templates)
+
+    today    = datetime.date.today()
+    exam_day = today - datetime.timedelta(days=random.randint(0, 30))
+    r_size   = round(random.uniform(9.2, 11.8), 1)
+    l_size   = round(random.uniform(9.2, 11.8), 1)
+    stone_size = random.randint(4, 14)
+
+    # Stone passage probability text
+    if stone_size < 4:
+        pass_prob      = "High — likely to pass spontaneously"
+        pass_prob_long = "Your stone is small and has a good chance of passing on its own."
+    elif stone_size <= 6:
+        pass_prob      = "Moderate — ~59% chance of spontaneous passage"
+        pass_prob_long = f"Your stone ({stone_size}mm) has about a 50-60% chance of passing on its own."
+    else:
+        pass_prob      = "Low — intervention likely required"
+        pass_prob_long = f"Your stone ({stone_size}mm) is unlikely to pass on its own and may need a procedure."
+
+    fields = dict(
+        date           = exam_day.strftime("%d %B %Y"),
+        pid            = f"CT-{random.randint(10000, 99999)}",
+        ref_doc        = f"{random.choice(LAST_NAMES)} ({random.choice(SPECIALTIES)})",
+        rad_doc        = random.choice(RADIOLOGISTS),
+        indication     = random.choice(INDICATIONS),
+        r_size         = r_size,
+        l_size         = l_size,
+        location       = random.choice(LOCATIONS),
+        # Cyst
+        cyst_size      = round(random.uniform(1.2, 5.5), 1),
+        # Tumor
+        tumor_size     = round(random.uniform(2.5, 8.0), 1),
+        # Stone
+        stone_size     = stone_size,
+        stone_num      = random.randint(1, 4),
+        stone_hu       = random.randint(400, 1200),
+        hyd_grade      = random.randint(1, 3),
+        pelvis_size    = random.randint(12, 22),
+        urt_size       = random.randint(6, 14),
+        pass_prob      = pass_prob,
+        pass_prob_long = pass_prob_long,
+    )
+
+    try:
+        return template.format(**fields)
+    except KeyError as e:
+        print(f"Warning: missing field {e}")
+        return template
+
+print("✅ Clinical report templates loaded!")
+print("   Test report preview (Stone):")
+print(make_report("Stone")[:300] + "...\n")
