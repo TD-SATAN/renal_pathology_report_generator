@@ -1,0 +1,56 @@
+
+
+def visualize_samples(df, n=2):
+    """Shows sample CT images from each class — safe sampling."""
+    labels = df["label"].unique()
+    fig, axes = plt.subplots(len(labels), n, figsize=(n * 4, len(labels) * 3))
+    fig.suptitle("Sample CT Kidney Images per Class", fontsize=14, fontweight="bold")
+
+    for row, label in enumerate(labels):
+        subset = df[df["label"] == label]
+
+        # ── FIX: use min(n, len(subset)) so we never ask for more than available ──
+        actual_n = min(n, len(subset))
+        samples  = subset.sample(actual_n, random_state=SEED)
+
+        for col in range(n):
+            ax = axes[row][col]
+            if col < actual_n:
+                _, row_data = list(samples.iterrows())[col]
+                try:
+                    img = Image.open(row_data["image_path"]).convert("RGB")
+                    ax.imshow(img, cmap="gray")
+                    ax.set_title(f"{label}", fontsize=10, fontweight="bold")
+                except Exception as e:
+                    ax.text(0.5, 0.5, f"Error\n{str(e)[:30]}",
+                            ha="center", va="center", fontsize=8)
+            else:
+                ax.text(0.5, 0.5, "No image", ha="center", va="center", fontsize=9,
+                        color="gray")
+            ax.axis("off")
+
+    plt.tight_layout()
+    plt.savefig("sample_images.png", dpi=100, bbox_inches="tight")
+    plt.show()
+    print("✅ Sample visualization saved as sample_images.png")
+
+# ── First print how many images per class so we can debug ──
+print("Images loaded per class:")
+print(df_all["label"].value_counts())
+print(f"Total: {len(df_all)}\n")
+
+visualize_samples(df_all)
+
+# ---- Class distribution bar chart ----
+plt.figure(figsize=(7, 4))
+counts = df_all["label"].value_counts()
+colors = ["#1D9E75", "#185FA5", "#D85A30", "#BA7517"]
+counts.plot(kind="bar", color=colors)
+plt.title("Class Distribution — CT Kidney Dataset", fontsize=13)
+plt.xlabel("Renal Condition")
+plt.ylabel("Number of Images")
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.savefig("class_distribution.png", dpi=100)
+plt.show()
+print("✅ Class distribution saved as class_distribution.png")
