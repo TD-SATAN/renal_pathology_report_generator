@@ -1,0 +1,58 @@
+
+
+class Vocabulary:
+    """
+    Maps every word in the reports to a unique integer.
+    Special tokens:
+        <PAD>=0  padding token
+        <SOS>=1  start of sentence
+        <EOS>=2  end of sentence
+        <UNK>=3  unknown word
+    """
+    def __init__(self, min_freq=1):
+        self.min_freq  = min_freq
+        self.word2idx  = {}
+        self.idx2word  = {}
+        self.word_freq = {}
+        for token in ["<PAD>", "<SOS>", "<EOS>", "<UNK>"]:
+            self._add(token)
+
+    def _add(self, word):
+        if word not in self.word2idx:
+            idx = len(self.word2idx)
+            self.word2idx[word] = idx
+            self.idx2word[idx]  = word
+
+    def build(self, texts):
+        for text in texts:
+            for w in text.lower().split():
+                self.word_freq[w] = self.word_freq.get(w, 0) + 1
+        for w, f in self.word_freq.items():
+            if f >= self.min_freq:
+                self._add(w)
+        print(f"✅ Vocabulary: {len(self.word2idx)} unique tokens")
+
+    def encode(self, text, max_len=80):
+        tokens = text.lower().split()
+        ids    = [self.word2idx["<SOS>"]]
+        for t in tokens[:max_len - 2]:
+            ids.append(self.word2idx.get(t, self.word2idx["<UNK>"]))
+        ids.append(self.word2idx["<EOS>"])
+        ids += [self.word2idx["<PAD>"]] * (max_len - len(ids))
+        return ids
+
+    def decode(self, indices):
+        words = []
+        for idx in indices:
+            w = self.idx2word.get(idx, "<UNK>")
+            if w in ["<PAD>", "<SOS>"]: continue
+            if w == "<EOS>": break
+            words.append(w)
+        return " ".join(words)
+
+    def __len__(self):
+        return len(self.word2idx)
+
+vocab = Vocabulary(min_freq=1)
+vocab.build(df_all["report"].tolist())
+print(f"   Sample: {vocab.decode(vocab.encode(df_all['report'].iloc[0]))[:100]}...")
