@@ -1,0 +1,107 @@
+
+
+# ---- Image Encoder ----
+class ImageEncoder(nn.Module):
+    def __init__(self, output_dim=512):
+        super().__init__()
+        resnet = models.resnet50(pretrained=True)
+        self.backbone   = nn.Sequential(*list(resnet.children())[:-1])
+        self.projection = nn.Sequential(nn.Linear(2048, output_dim),
+                                        nn.ReLU(), nn.Dropout(0.2))
+        for p in self.backbone[-1].parameters():
+            p.requires_grad = True  # fine-tune last ResNet layer
+
+    def forward(self, x):
+        f = self.backbone(x).view(x.size(0), -1)   # (B, 2048)
+        return self.projection(f)                   # (B, 512)
+
+
+# ---- Text Encoder (BERT) ----
+class TextEncoder(nn.Module):
+    def __init__(self, output_dim=512):
+        super().__init__()
+        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        # Fine-tune only last 2 layers to save memory
+        for i, layer in enumerate(self.bert.encoder.layer):
+            for p in layer.parameters():
+                p.requires_grad = (i >= 10)
+        self.proj = nn.Sequential(nn.Linear(768, output_dim),
+                                  nn.ReLU(), nn.Dropout(0.1))
+
+    def forward(self, input_ids, attention_mask=None):
+        out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        return self.proj(out.last_hidden_state)   # (B, seq, 512)
+
+
+# ---- Multi-Head Attention Fusion ----
+class MHAFusion(nn.Module):
+    def __init__(self, embed_dim=512, num_heads=8, dropout=0.2):
+        super().__init__()
+        self.mha     = nn.MultiheadAttention(embed_dim, num_heads,
+                                              dropout=dropout, batch_first=True)
+        self.norm    = nn.LayerNorm(embed_dim)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, kv):
+        if kv.dim() == 2:
+            kv = kv.unsqueeze(1)
+        attn_out, weights = self.mha(query, kv, kv)
+        return self.norm(query + self.dropout(attn_out)), weights
+
+
+# ---- LSTM Decoder ----
+class LSTMDecoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim=512, hidden_dim=512):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.lstm      = nn.LSTM(embed_dim * 2, hidden_dim, batch_first=True)
+        self.fc        = nn.Linear(hidden_dim, vocab_size)
+        self.drop      = nn.Dropout(0.2)
+
+    def forward(self, context, report_ids):
+        emb   = self.drop(self.embedding(report_ids))        # (B, S, 512)
+        inp   = torch.cat([emb, context], dim=-1)            # (B, S, 1024)
+        out,_ = self.lstm(inp)                               # (B, S, 512)
+        return self.fc(out)                                  # (B, S, vocab)
+
+
+# ---- Full Model ----
+class RenalReportGenerator(nn.Module):
+    def __init__(self, vocab_size, embed_dim=512, num_heads=8, hidden_dim=512):
+        super().__init__()
+        self.img_enc = ImageEncoder(embed_dim)
+        self.txt_enc = TextEncoder(embed_dim)
+        self.mha     = MHAFusion(embed_dim, num_heads)
+        self.decoder = LSTMDecoder(vocab_size, embed_dim, hidden_dim)
+
+    def forward(self, images, report_ids):
+        img_feat  = self.img_enc(images)
+        attn_mask = (report_ids != 0).long()
+        txt_emb   = self.txt_enc(report_ids, attn_mask)
+        context,_ = self.mha(txt_emb, img_feat)
+        return self.decoder(context, report_ids)
+
+    def generate(self, image, vocab, max_len=80, device="cpu"):
+        self.eval()
+        with torch.no_grad():
+            img_feat = self.img_enc(image.to(device))
+            input_ids = torch.tensor([[vocab.word2idx["<SOS>"]]], device=device)
+            words = []
+            for _ in range(max_len):
+                mask    = torch.ones_like(input_ids)
+                txt_emb = self.txt_enc(input_ids, mask)
+                ctx,_   = self.mha(txt_emb, img_feat)
+                logits  = self.decoder(ctx, input_ids)
+                nxt     = logits[:, -1, :].argmax(-1)
+                word    = vocab.idx2word.get(nxt.item(), "<UNK>")
+                if word == "<EOS>": break
+                words.append(word)
+                input_ids = torch.cat([input_ids, nxt.unsqueeze(0)], dim=1)
+        return " ".join(words)
+
+
+model = RenalReportGenerator(vocab_size=len(vocab)).to(DEVICE)
+n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f"✅ Model ready | Trainable parameters: {n_params:,}")
+
+
