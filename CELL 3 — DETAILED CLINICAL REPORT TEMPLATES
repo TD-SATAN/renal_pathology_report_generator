@@ -1,8 +1,4 @@
-# ==============================================================================
-# ████  CELL 3 — DETAILED CLINICAL REPORT TEMPLATES  ████
-# This cell defines all 4 condition report templates (Normal/Cyst/Tumor/Stone)
-# Run this cell before anything else that uses make_report()
-# ==============================================================================
+
 
 # ---------------------------------------------------------------------------
 # Report templates — written like real radiologist reports given to patients
