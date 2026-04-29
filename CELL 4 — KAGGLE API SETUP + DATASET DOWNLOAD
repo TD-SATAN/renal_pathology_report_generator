@@ -1,0 +1,19 @@
+# ==============================================================================
+# ████  CELL 4 — KAGGLE API SETUP + DATASET DOWNLOAD  ████
+# BEFORE running this cell:
+#   1. Go to kaggle.com → Account → Settings → API → Create New Token
+#   2. kaggle.json will download to your computer
+#   3. Click the 📁 folder icon in Colab left sidebar → Upload → select kaggle.json
+# ==============================================================================
+
+from google.colab import drive
+
+# This mounts your Google Drive at /content/drive
+drive.mount('/content/drive')
+print("✅ Google Drive mounted!")
+
+# List what's in your drive to confirm
+import os
+print("\nYour Drive contents:")
+for item in os.listdir('/content/drive/MyDrive/'):
+    print(f"  {item}")
